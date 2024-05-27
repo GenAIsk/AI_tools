@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="com.obiscr.chatgpt.settings.EasyCodeState">
+    <option name="projectFiles" value="$PROJECT_DIR$/.run/Run IDE with Plugin.run.xml;D:/OpenAI/Git-Repository/AI_tools/src/main/java/com/sk/plugin/ChatGPTToolWindow.java;D:/OpenAI/Git-Repository/AI_tools/src/main/java/com/sk/plugin/ChatGPTToolWindowFactory.java;D:/OpenAI/Git-Repository/AI_tools/src/main/java/com/sk/plugin/ShowChatGPTToolWindowAction.java;D:/OpenAI/Git-Repository/AI_tools/src/main/resources/META-INF/plugin.xml;D:/OpenAI/Git-Repository/AI_tools/src/main/resources/META-INF/plugin_bkp.xml" />
+  </component>
+</project>
