@@ -1,5 +1,7 @@
 package com.sk.plugin;
 
+import com.intellij.ui.JBColor;
+import com.intellij.ui.components.JBTabbedPane;
 import okhttp3.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -8,24 +10,23 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.io.IOException;
+import java.net.URI;
 
 public class ChatGPTToolWindow {
+
     private JPanel mainPanel;
     private JTextArea inputTextArea;
-    private JButton sendButton;
     private JTextArea outputTextArea;
-    private static final String OPENAI_API_KEY = "YOUR API KEY";
+    private final JButton sendButton;
+    private static final String API = "Enter your API";
     private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
     private static final String DEFAULT_INPUT_TEXT = "Enter your prompt here...";
+    private JTextArea onlineGPTInputTextArea;
 
     public ChatGPTToolWindow() {
-        // Initialize UI components
+        sendButton = new JButton("Send");
         createUIComponents();
-
-        // Set up the send button action
         sendButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -65,7 +66,7 @@ public class ChatGPTToolWindow {
         // Create the HTTP request
         Request request = new Request.Builder()
                 .url(OPENAI_API_URL)
-                .header("Authorization", "Bearer " + OPENAI_API_KEY)
+                .header("Authorization", "Bearer " + API)
                 .post(body)
                 .build();
 
@@ -80,27 +81,35 @@ public class ChatGPTToolWindow {
     }
 
     private void createUIComponents() {
+        // Create the main panel with a BorderLayout
         mainPanel = new JPanel(new BorderLayout());
-
+        // Create tabbed pane
+        JBTabbedPane tabbedPane = new JBTabbedPane();
+        // Create ChatGPT panel
+        JPanel chatGPTPanel = new JPanel(new BorderLayout());
         // Initialize the text areas and button
         inputTextArea = new JTextArea(DEFAULT_INPUT_TEXT);
         outputTextArea = new JTextArea();
-        sendButton = new JButton("Send");
+        JTextField urlTextField = new JTextField("https://www.openai.com");
 
         // Set preferred sizes for the text areas
         inputTextArea.setPreferredSize(new Dimension(400, 100));
-
-        inputTextArea.addFocusListener(new FocusAdapter() {
+        outputTextArea.setPreferredSize(new Dimension(400, 300));
+        urlTextField.setPreferredSize(new Dimension(400, 30));
+        // Make the output text area non-editable
+        outputTextArea.setEditable(false);
+        outputTextArea.setForeground(Color.white);
+        // Add focus listener to input text area to clear default text on focus
+        inputTextArea.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
-            public void focusGained(FocusEvent e) {
+            public void focusGained(java.awt.event.FocusEvent e) {
                 if (inputTextArea.getText().equals(DEFAULT_INPUT_TEXT)) {
                     inputTextArea.setText("");
                     inputTextArea.setForeground(Color.white);
                 }
             }
-
             @Override
-            public void focusLost(FocusEvent e) {
+            public void focusLost(java.awt.event.FocusEvent e) {
                 if (inputTextArea.getText().isEmpty()) {
                     inputTextArea.setText(DEFAULT_INPUT_TEXT);
                     inputTextArea.setForeground(Color.white);
@@ -111,17 +120,49 @@ public class ChatGPTToolWindow {
         // Set initial color to gray to indicate placeholder text
         inputTextArea.setForeground(Color.white);
 
-
-        outputTextArea.setPreferredSize(new Dimension(400, 300));
-
-        // Make the output text area non-editable
-        outputTextArea.setEditable(false);
-
-        // Add components to the main panel
-        mainPanel.add(new JScrollPane(outputTextArea), BorderLayout.CENTER);
+        // Add components to the ChatGPT panel
+        chatGPTPanel.add(new JScrollPane(outputTextArea), BorderLayout.CENTER);
         JPanel inputPanel = new JPanel(new BorderLayout());
         inputPanel.add(new JScrollPane(inputTextArea), BorderLayout.CENTER);
         inputPanel.add(sendButton, BorderLayout.EAST);
-        mainPanel.add(inputPanel, BorderLayout.SOUTH);
+        chatGPTPanel.add(inputPanel, BorderLayout.SOUTH);
+        // Add ChatGPT panel to tabbed pane
+        tabbedPane.addTab("Online GPT", chatGPTPanel);
+        // Create Online GPT panel
+        JPanel onlineGPTPanel = new JPanel(new BorderLayout());
+        onlineGPTInputTextArea = new JTextArea(DEFAULT_INPUT_TEXT);
+        JButton openAIButton = new JButton("Open OpenAI Website");
+        openAIButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    Desktop.getDesktop().browse(new URI("https://www.openai.com"));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        // Add focus listener to online GPT input text area to clear default text on focus
+        onlineGPTInputTextArea.addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
+                if (onlineGPTInputTextArea.getText().equals(DEFAULT_INPUT_TEXT)) {
+                    onlineGPTInputTextArea.setText("");
+                    onlineGPTInputTextArea.setForeground(JBColor.white);
+                }
+            }
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                if (onlineGPTInputTextArea.getText().isEmpty()) {
+                    onlineGPTInputTextArea.setText(DEFAULT_INPUT_TEXT);
+                    onlineGPTInputTextArea.setForeground(JBColor.white);
+                }
+            }
+        });
+        onlineGPTPanel.add(openAIButton, BorderLayout.SOUTH);
+        onlineGPTPanel.add(urlTextField, BorderLayout.NORTH);
+        tabbedPane.addTab("OpenAPI", onlineGPTPanel);
+        mainPanel.add(tabbedPane, BorderLayout.CENTER);
     }
 }
